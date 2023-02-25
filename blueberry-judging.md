@@ -1,6 +1,7 @@
 # Blueberry judging
 https://github.com/sherlock-audit/2023-02-blueberry-judging-petya0111 
 
+```
 001-H ERC20 transfer result in the contract MockWETH.sol is not checked
 002-H ISOLATED COLLATERALS CAN BE STOLEN  IN ICHIVAULTSPELL.SOL VIA reducePosition() AS THERE IS NO ACCESS CONTROL IMPLEMENTED
 003-H First depositor can manipulate share price of SoftVault
@@ -76,3 +77,4 @@ https://github.com/sherlock-audit/2023-02-blueberry-judging-petya0111
 038-M Unrestricted burn and harvest users can loss their funds.
 039-M No storage gap for upgradable contracts might lead to storage slot collision
 040-M The protocol is missing the feature to remove an user from whitelist. Once an user has been added to the whitelist, it is not possible to remove him from the whitelist.
+```

@@ -1,7 +1,7 @@
 # Carapace judging
 https://github.com/sherlock-audit/2023-02-carapace-judging-petya0111 
 
-
+```
 001-H When user make a withdrawal request there is no change and record for user's balance in the process. User's balance can be reused to submit a withdrawal request that breaks the logic of deposit and withdrawal.
 002-H Run withdraw() after accruePremiumAndExpireProtections() can redeem more more underlying tokens
 003-H In the function ```lockCapital()```, the protocol may set ```totalSTokenUnderlying``` to be 0,It is an important factor in the calculation of the exchange rate and leverage ratio which used in ```deposit()``` ,```withdraw()``` and ```buyProtection()```.
@@ -62,3 +62,4 @@ https://github.com/sherlock-audit/2023-02-carapace-judging-petya0111
 028-M If noone called ProtectionPoolCycleManager.calculateAndSetPoolCycleState during the cycle, then cycle calculation is broken
 029-M The cronjob `DefaultStateManager.assessStates` can become more costly than how it should be
 030-M A LendingProtocolAdapter can be created for 0 addresses
+```

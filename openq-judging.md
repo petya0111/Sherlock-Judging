@@ -1,6 +1,7 @@
-OpenQ judging
+# OpenQ judging
 https://github.com/sherlock-audit/2023-02-openq-judging-petya0111 
 
+```
 001-H Unbounded loop in BounyCore.getLockedFunds function leads to DOS in DepositManagerV1.refundDeposit function
 002-H Remaining funds cannot be refunded after partial refund
 003-H Issuer can front-run claimTieredFixed() and change payoutTokenAddress. This call, in turn, calls `TieredFixedBountyV1.claimTieredFixed()` and transfers the `payoutTokenAddress` token to the `_payoutAddress`.
@@ -49,3 +50,4 @@ https://github.com/sherlock-audit/2023-02-openq-judging-petya0111
 025-M BountyCore.receiveFunds doesn't return back native payment in case when it was provided along with another token
 026-M ClaimManagerV1 will not be able to claim for user if he is blocked by any reward token
 027-M `TieredFixedBounty` accepts any ERC20 token as deposit, but can only pay in the pre-specified token
+```
