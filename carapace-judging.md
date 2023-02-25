@@ -21,6 +21,14 @@ https://github.com/sherlock-audit/2023-02-carapace-judging-petya0111
 017-H possible race condition between `ProtectionPool::withdraw` and `DefaultStateManager::assessState`
 018-H Seller can request multiple withdrawals using same sTokens by using multiple addresses. This will allow him to deposit protection without risk two cycles in the future.
 019-H withdrawlRequests and totalSTokenRequested are not updated when sTokens are transferred
+020-H ProtectionPoolHelper.verifyBuyerCanRenewProtection contains no checks for how much protection is under a renewal. The renewed protection can be for 1/1000th as much as the previous, or for 1000x more. 
+021-H ProtectionPool.lockCapital doesn't check if protection is already expired which increases locked capital. Excess amount can be locked forever.
+022-H An arithmetic overflow may occur if `_exp1` is close to 1, and the value returned by `Constants.SCALE_18_DECIMALS_INT` is not large enough to prevent the division from exceeding the maximum value of `int256`.
+023-H ProtectionPool limits single protections to not be over the limit of the remaining principal for the position. But there's nothing stopping a lender to do multiple protections of the full amount for the same position as long as they stay within leverage limit.
+024-H Malicious protection buyer can manipulate pool leverage ratio to block genuine protection buyers
+025-H Protection Seller should not be able to deposit into the Protection if the ProtectionPool is not supported, or expired or defaulted
+
+
 
 
 
@@ -44,3 +52,13 @@ https://github.com/sherlock-audit/2023-02-carapace-judging-petya0111
 018-M USDC  have a contract level admin controlled address blocklist. If an address is blocked, then transfers to and from that address are forbidden.
 019-M Unable to withdraw the ETH locked in the contract
 020-M sToken can be inflated because the balanceOf function does not specify the token used.
+021-M An attacker may leverage flashloan of sToken to claim capital from a protection pool without actually provide underlying token.
+022-M ProtectionPool._accruePremiumAndExpireProtections function is called to collect premium for active protections and also remove expired protections from active list.
+023-M Function `_assessState` loops through all lending pools of protection pool in order to check their state. In case if lending pool is late in payment, then `DefaultStateManager._moveFromActiveToLockedState` function [is called]  in order to lock capital.
+024-M The `calculateKAndLambda` function in the `AccruedPremiumCalculator` library contract has a potential risk of integer overflow due to casting `uint256` arguments to `int256` and may allow an attacker to exploit the calculation and cause a crash, freeze.
+025-M If a pool goes back and forth between Late and Active and a protection seller fails to claim their unlocked funds they are lost. non claimed `unlockedFunds` are stuck in `ProtectionPool`
+026-M defaultStateManager.getLendingPoolStatus can be stale which allows user to buy/renew protection when he should not
+027-M `ProtectionPoolCycleManager` does not support change state from Open to Open
+028-M If noone called ProtectionPoolCycleManager.calculateAndSetPoolCycleState during the cycle, then cycle calculation is broken
+029-M The cronjob `DefaultStateManager.assessStates` can become more costly than how it should be
+030-M A LendingProtocolAdapter can be created for 0 addresses
