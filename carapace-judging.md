@@ -27,8 +27,13 @@ https://github.com/sherlock-audit/2023-02-carapace-judging-petya0111
 023-H ProtectionPool limits single protections to not be over the limit of the remaining principal for the position. But there's nothing stopping a lender to do multiple protections of the full amount for the same position as long as they stay within leverage limit.
 024-H Malicious protection buyer can manipulate pool leverage ratio to block genuine protection buyers
 025-H Protection Seller should not be able to deposit into the Protection if the ProtectionPool is not supported, or expired or defaulted
-
-
+026-H There is a ````New Protection Rule```` for buyers which is due to A buyer can only buy new protection within 90 days after a lending pool is added to our pool.
+027-H The Carapace protocol checks that a protection buyer does not buy a protection for an  amount greater than the remainingPrincipal in the corresponding loan. However it possible for the buyer to buy multiple different protections for the same Goldfinch loan.
+028-H No way to exercise the protection if the lending pool goes to default state / protection seller can never get their capital unlocked
+029-H In ProtectionPoolHelper.sol, `expireProtection() is set to public and does not require any msg.sender checks. Anyone can expire a buyer's protection and deem it useless.
+030-H During `buyProtection` process, there are many validations ongoing in order to change the protection parameter states accordingly.
+The below steps show the steps in order to successfully buy protection.
+031-H Using a secondary market like uniswap a user can use flash loans to take shares of interest without taking any of the risk.
 
 
 
@@ -50,7 +55,7 @@ https://github.com/sherlock-audit/2023-02-carapace-judging-petya0111
 016-M User can loose Stoken without receiving underlying token when withdrawing small Stoken shares due to the function `convertToUnderlying` might return 0 if `_sTokenShares` is small enough, and also because function `withdraw` does not check if `_underlyingAmountToTransfer` (result from `convertToUnderlying`) > 0.
 017-M No storage gap for upgradeable contracts might lead to storage slot collision
 018-M USDC  have a contract level admin controlled address blocklist. If an address is blocked, then transfers to and from that address are forbidden.
-019-M Unable to withdraw the ETH locked in the contract
+019-M When a seller deposits and decides to withdraw, they must first call `requestWithdrawal()` which calls `_requestWithdrawal()`. `_requestWithdrawal()` then checks whether the withdrawal is allowed and the amount requested. 
 020-M sToken can be inflated because the balanceOf function does not specify the token used.
 021-M An attacker may leverage flashloan of sToken to claim capital from a protection pool without actually provide underlying token.
 022-M ProtectionPool._accruePremiumAndExpireProtections function is called to collect premium for active protections and also remove expired protections from active list.
@@ -62,4 +67,10 @@ https://github.com/sherlock-audit/2023-02-carapace-judging-petya0111
 028-M If noone called ProtectionPoolCycleManager.calculateAndSetPoolCycleState during the cycle, then cycle calculation is broken
 029-M The cronjob `DefaultStateManager.assessStates` can become more costly than how it should be
 030-M A LendingProtocolAdapter can be created for 0 addresses
+031-M ProtectionPool#_accruePremiumAndExpireProtections loops through every active protection. An adversary could create a large number of small protections that would cause an OOG error blocking accrual of premium.
+032-M In some cases the protocol can contain zero funds while having a non zero totalSupply of STokens. In that case the protocol will not be able to accept any new deposits and any new protection buys, thus coming to a halt, unless all STokens are burned by their respective holders.
+033-M After protection sellers withdrawals, the protection pool may end up with `totalSTokenUnderlying < poolInfo.params.minRequiredCapital`. The documentation says that buyers should not be able to buy protection in that case but it is not checked in `buyProtection` once the pool is already open.
+034-M DefaultStateManager._assessState waits longer to change state to active again.
+035-M `totalSTokenUnderlying` not timely updated
+036-M Missing check to verify if _underlyingAmountToDeposit is !=0
 ```
