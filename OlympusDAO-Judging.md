@@ -23,6 +23,8 @@ https://github.com/sherlock-audit/2023-02-olympus-judging-petya0111
 019-H Last claimed timestamp for internal rewards is not updated resulting in the theft of LDO tokens
 020-H Vault may prevent withdraw / deposit due to outdated oracle price
 021-H Impermanent loss different from stated in docs
+022-H `cachedUserRewards` and `userRewardDebts` shouldn’t be divided by 1e18 in `internalRewardsForToken()` and `externalRewardsForToken()
+023-H In `_withdrawUpdateRewardState()` the `cachedUserRewards` is updated after setting `userRewardDebts` to zero. It should be updated before that. This causes the `userRewardDebts` not to be subtracted from the `cachedUserRewards` which will be larger than expected. This allows to steal rewards.
 
 
 
@@ -87,6 +89,14 @@ https://github.com/sherlock-audit/2023-02-olympus-judging-petya0111
 058-M If an internal token startTimestamp_ ( The timestamp at which to start distributing rewards ) is higher that block.timestamp first depositor can earn rewards before startTimestamp_ 
 059-M `abstracts/SingleSidedLiquidityVault.sol` doesn't handle fee-on-transfer pairToken.
 060-M In `SingleSidedLiquidityVault.sol` we have function [withdraw()] A user can only use this function when `onlyWhileActive` modifier is true. 
+061-M The Aura/Balancer community DAO's behavior of adding extra rewards can break the caveats around external reward token of the SSLV
+062-M If denominator > numerator ,in that case 0 will be returned ,causing miscalculation
+063-M when first depositor made first deposit the updateInternalRewardState function sets lastRewardTime to block.timestamp without checking lastRewardTime has arrived 
+064-M claiming rewards can be started before startTimestamp_
+065-M The `deactivate()` function of `SingleSidedLiquidityVault.sol` removes the vault from the registry.
+066-M SingleSidedLiquidityVault.sol contract uses the PRECISION as 1000. since the ERC tokens mentioned in the document has different decimal values, precision based calculation could affect the AURA.
+067-M `pairTokenDecimals` VARIABLE IS USED AS BOTH `storage` variable and `memory` VARIABLE
+
 
 
 
